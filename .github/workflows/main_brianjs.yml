@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy Node.js app to Azure Web App - BrianJs
 
 on:
@@ -24,11 +27,14 @@ jobs:
           npm run build --if-present
           npm run test --if-present
 
+      - name: Zip artifact for deployment
+        run: zip release.zip ./* -r
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .  # Upload the entire directory
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -37,7 +43,7 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write # This is required for requesting the JWT
+      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
@@ -45,12 +51,15 @@ jobs:
         with:
           name: node-app
 
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A9C5B5AAA0494959B7A56871C6EFF0BD }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8D6DB8634DAB45B7897824BC6A039150 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_189787639B114F54B7E6973D99E07CD5 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_412EB910114A4745840965A15028A4C7 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_00A261202395478791908026FE01916E }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4FA3BA1DF3D841AA86B9B30544E964AC }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
@@ -58,4 +67,5 @@ jobs:
         with:
           app-name: 'BrianJs'
           slot-name: 'Production'
-          package: ./  # Adjust this if necessary
+          package: .
+          
